@@ -1,0 +1,299 @@
+﻿@{
+    ViewData["Title"] = "Reports & Analytics";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-chart-bar me-2"></i>Reports & Analytics
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="exportReport()">
+                <i class="fas fa-download me-1"></i>Export Report
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total Employees
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalEmployees">0</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Active Leave Requests
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="activeLeaves">0</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Monthly Payroll
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="monthlyPayroll">$0</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Avg. Leave Days
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="avgLeaveDays">0</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Navigation Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-4">
+        <a href="/Reports/LeaveSummary" class="card report-card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="fas fa-calendar-check fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Leave Summary</h5>
+                <p class="card-text text-muted">Detailed analysis of leave patterns and trends</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 mb-4">
+        <a href="/Reports/PayrollSummary" class="card report-card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="fas fa-money-bill-wave fa-3x text-success mb-3"></i>
+                <h5 class="card-title">Payroll Summary</h5>
+                <p class="card-text text-muted">Payroll analysis and cost breakdown</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 mb-4">
+        <a href="/Reports/EmployeeAttendance" class="card report-card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="fas fa-user-clock fa-3x text-info mb-3"></i>
+                <h5 class="card-title">Attendance Report</h5>
+                <p class="card-text text-muted">Employee attendance and leave patterns</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 mb-4">
+        <a href="#" class="card report-card h-100 text-decoration-none" onclick="showCustomReport()">
+            <div class="card-body text-center">
+                <i class="fas fa-chart-pie fa-3x text-warning mb-3"></i>
+                <h5 class="card-title">Custom Reports</h5>
+                <p class="card-text text-muted">Generate custom reports and analytics</p>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-line me-2"></i>Leave Trends (Last 6 Months)
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="leaveTrendChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>Leave Distribution
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="leaveTypeChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Leave by Department
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="departmentLeaveChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-money-bill me-2"></i>Payroll by Department
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="departmentPayrollChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .report-card {
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: 1px solid #e3e6f0;
+    }
+
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: #4e73df;
+        }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            loadDashboardStats();
+            loadCharts();
+        });
+
+        function loadDashboardStats() {
+            $.ajax({
+                url: '/Reports/GetDashboardStats',
+                type: 'GET',
+                success: function(data) {
+                    if (data.success) {
+                        $('#totalEmployees').text(data.stats.totalEmployees);
+                        $('#activeLeaves').text(data.stats.activeLeaves);
+                        $('#monthlyPayroll').text('$' + data.stats.monthlyPayroll.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+                        $('#avgLeaveDays').text(data.stats.avgLeaveDays);
+                    }
+                }
+            });
+        }
+
+        function loadCharts() {
+            // Load leave trend chart
+            loadChartData('attendanceTrend', 'leaveTrendChart', 'line');
+
+            // Load leave type chart
+            loadChartData('leaveByType', 'leaveTypeChart', 'doughnut');
+
+            // Load department leave chart
+            loadChartData('leaveByDepartment', 'departmentLeaveChart', 'bar');
+
+            // Load department payroll chart
+            loadChartData('payrollByDepartment', 'departmentPayrollChart', 'bar');
+        }
+
+        function loadChartData(chartType, canvasId, chartTypeName) {
+            $.ajax({
+                url: '/Reports/GetChartData',
+                type: 'GET',
+                data: { chartType: chartType },
+                success: function(response) {
+                    if (response.success) {
+                        createChart(canvasId, chartTypeName, response.data);
+                    }
+                }
+            });
+        }
+
+        function createChart(canvasId, type, data) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+
+            const config = {
+                type: type,
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.data,
+                        backgroundColor: data.backgroundColor || [
+                            '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b',
+                            '#858796', '#5a5c69', '#2e59d9', '#17a673', '#2c9faf'
+                        ],
+                        borderColor: type === 'line' ? '#4e73df' : undefined,
+                        borderWidth: type === 'line' ? 2 : 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: type === 'doughnut' ? 'bottom' : 'top',
+                        },
+                        title: {
+                            display: false
+                        }
+                    },
+                    scales: type !== 'doughnut' && type !== 'pie' ? {
+                        y: {
+                            beginAtZero: true
+                        }
+                    } : undefined
+                }
+            };
+
+            new Chart(ctx, config);
+        }
+
+        function exportReport() {
+            // Simple export functionality - in real app, generate PDF/Excel
+            const today = new Date().toISOString().split('T')[0];
+            alert(`Report export functionality would generate a comprehensive report for ${today}`);
+        }
+
+        function showCustomReport() {
+            alert('Custom report generator would open here with advanced filtering options');
+        }
+    </script>
+}

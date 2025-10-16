@@ -1,0 +1,135 @@
+﻿@model IEnumerable<AuditLog>
+@{
+    ViewData["Title"] = "Audit Logs";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-clipboard-list me-2"></i>Audit Logs
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <span class="me-3 text-muted">System Activity Tracking</span>
+    </div>
+</div>
+
+<!-- Filter Section -->
+<div class="card mb-4">
+    <div class="card-header bg-white">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-filter me-2"></i>Filter Logs
+        </h5>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Entity Type</label>
+                <select name="entityType" class="form-select">
+                    <option value="">All Types</option>
+                    <option value="Employee" selected="@(ViewBag.EntityType == "Employee")">Employee</option>
+                    <option value="LeaveRequest" selected="@(ViewBag.EntityType == "LeaveRequest")">Leave Request</option>
+                    <option value="Payroll" selected="@(ViewBag.EntityType == "Payroll")">Payroll</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">From Date</label>
+                <input type="date" name="fromDate" class="form-control" value="@ViewBag.FromDate">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">To Date</label>
+                <input type="date" name="toDate" class="form-control" value="@ViewBag.ToDate">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">&nbsp;</label>
+                <div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i>Apply Filters
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Audit Logs Table -->
+<div class="card">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">System Activity Log</h5>
+        <span class="badge bg-primary">@Model.Count() Records</span>
+    </div>
+    <div class="card-body">
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No Audit Logs</h4>
+                <p class="text-muted">No system activity found for the selected filters.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover" id="auditTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Entity</th>
+                            <th>Entity ID</th>
+                            <th>IP Address</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var log in Model)
+                        {
+                            var actionBadge = log.Action switch
+                            {
+                                "Created" => "success",
+                                "Updated" => "warning",
+                                "Deleted" => "danger",
+                                "Approved" => "info",
+                                "Rejected" => "danger",
+                                _ => "secondary"
+                            };
+
+                            <tr>
+                                <td>@log.Timestamp.ToString("MMM dd, yyyy HH:mm")</td>
+                                <td>
+                                    <small class="text-muted">@log.UserId</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-@actionBadge">@log.Action</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">@log.EntityType</span>
+                                </td>
+                                <td>@log.EntityId</td>
+                                <td>
+                                    <small class="text-muted">@log.IPAddress</small>
+                                </td>
+                                <td>
+                                    <a href="/Audit/Details/@log.Id" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#auditTable').DataTable({
+                "order": [[0, "desc"]],
+                "responsive": true,
+                "pageLength": 25
+            });
+        });
+    </script>
+}

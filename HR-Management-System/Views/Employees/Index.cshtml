@@ -1,0 +1,143 @@
+﻿@model IEnumerable<Employee>
+@{
+    ViewData["Title"] = "Employees Management";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-users me-2"></i>Employees Management
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="/Employees/Create" class="btn btn-success">
+            <i class="fas fa-plus-circle me-1"></i>Add New Employee
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white">
+        <h5 class="card-title mb-0">All Employees</h5>
+    </div>
+    <div class="card-body">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No Employees Found</h4>
+                <p class="text-muted">No employee records have been created yet.</p>
+                <a href="/Employees/Create" class="btn btn-primary mt-2">
+                    <i class="fas fa-plus-circle me-1"></i>Add First Employee
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover" id="employeesTable">
+                    <thead class="table-dark">
+                        <tr>
+                            @* <th>ID</th> *@
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Position</th>
+                            <th>Salary</th>
+                            <th>Role</th>
+                            <th>Leave Balance</th>
+                            <th>Hire Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var employee in Model)
+                        {
+                            // Safe null check for each employee
+                            if (employee != null)
+                            {
+                                <tr>
+                                    @* <td>@employee.Id</td> *@
+                                    <td>
+                                        <strong>@(employee.Name ?? "N/A")</strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">@(employee.Department ?? "N/A")</span>
+                                    </td>
+                                    <td>@(employee.Position ?? "N/A")</td>
+                                    <td>
+                                        <span class="fw-bold text-success">$@(employee.Salary.ToString("N2") ?? "0.00")</span>
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(employee.Role))
+                                        {
+                                            @switch (employee.Role)
+                                            {
+                                                case "Admin":
+                                                    <span class="badge bg-danger">@employee.Role</span>
+                                                    break;
+                                                case "HR":
+                                                    <span class="badge bg-warning">@employee.Role</span>
+                                                    break;
+                                                case "Manager":
+                                                    <span class="badge bg-primary">@employee.Role</span>
+                                                    break;
+                                                default:
+                                                    <span class="badge bg-secondary">@employee.Role</span>
+                                                    break;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">N/A</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold @(employee.LeaveBalance < 5 ? "text-danger" : "text-success")">
+                                            @employee.LeaveBalance days
+                                        </span>
+                                    </td>
+                                    <td>@(employee.HireDate.ToString("MMM dd, yyyy") ?? "N/A")</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="/Employees/Edit/@employee.Id" class="btn btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            @* <a href="/Employees/DeleteConfirmed/@employee.Id" class="btn btn-outline-danger"> *@
+                                            @*     <i class="fas fa-trash"></i> *@
+                                            @* </a> *@
+
+                                            <form  class="ms-1" asp-action="Delete" asp-route-id="@employee.Id" method="post" onsubmit="return confirm('Are you sure you want to delete this?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+
+                                            </form>
+                                            @* <a asp-controller="Employee" asp-action="DeleteConfirmed" class="btn btn-outline-danger"> *@
+                                            @*     <i class="fas fa-trash"></i> *@
+                                            @* </a> *@
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Only initialize DataTable if table exists and has data
+            var table = $('#employeesTable');
+            if (table.length && table.find('tbody tr').length > 0) {
+                table.DataTable({
+                    "order": [[0, "desc"]],
+                    "responsive": true,
+                    "columnDefs": [
+                        { "orderable": false, "targets": 8 } // Disable sorting for Actions column
+                    ]
+                });
+            }
+        });
+    </script>
+}

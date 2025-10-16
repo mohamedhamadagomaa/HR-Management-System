@@ -1,0 +1,159 @@
+﻿@model Employee
+@{
+    ViewData["Title"] = "Add New Employee";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-user-plus me-2"></i>Add New Employee
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="/Employees" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Back to List
+        </a>
+    </div>
+</div>
+
+<!-- Debug Info -->
+<div class="alert alert-info d-none" id="debugInfo">
+    <strong>Debug Info:</strong>
+    <div id="debugContent"></div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Employee Information</h5>
+            </div>
+            <div class="card-body">
+                <form id="createForm" asp-action="Create" method="post">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Name" class="form-label">Full Name *</label>
+                            <input asp-for="Name" class="form-control" placeholder="Enter full name" required>
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Department" class="form-label">Department *</label>
+                            <select asp-for="Department" class="form-select" required>
+                                <option value="">Select Department</option>
+                                <option value="IT">Information Technology</option>
+                                <option value="HR">Human Resources</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Sales">Sales</option>
+                                <option value="Operations">Operations</option>
+                            </select>
+                            <span asp-validation-for="Department" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Position" class="form-label">Position *</label>
+                            <input asp-for="Position" class="form-control" placeholder="Enter job position" required>
+                            <span asp-validation-for="Position" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Salary" class="form-label">Monthly Salary *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="Salary" type="number" step="0.01" class="form-control" placeholder="0.00" value="3000" required>
+                            </div>
+                            <span asp-validation-for="Salary" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Role" class="form-label">Role *</label>
+                            <select asp-for="Role" class="form-select" required>
+                                <option value="Employee">Employee</option>
+                                <option value="Manager">Manager</option>
+                                <option value="HR">HR</option>
+                                <option value="Admin">Admin</option>
+                            </select>
+                            <span asp-validation-for="Role" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="HireDate" class="form-label">Hire Date *</label>
+                            <input asp-for="HireDate" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" required>
+                            <span asp-validation-for="HireDate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="LeaveBalance" class="form-label">Initial Leave Balance</label>
+                            <input asp-for="LeaveBalance" type="number" class="form-control" value="21">
+                            <span asp-validation-for="LeaveBalance" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">User ID (Optional)</label>
+                            <input asp-for="UserId" class="form-control" placeholder="Leave empty for now">
+                            <span asp-validation-for="UserId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-success me-2" id="submitBtn">
+                                <i class="fas fa-save me-1"></i>Create Employee
+                            </button>
+                            <a href="/Employees" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // Debug form submission
+            $('#createForm').on('submit', function(e) {
+                console.log('Form submitted');
+                $('#debugInfo').removeClass('d-none');
+
+                var formData = $(this).serialize();
+                $('#debugContent').html('Form data: ' + formData);
+
+                // Don't prevent default - let it submit
+            });
+
+            // Check if form validation is working
+            $('#submitBtn').on('click', function() {
+                console.log('Submit button clicked');
+
+                // Basic client-side validation
+                var isValid = true;
+                $('input[required], select[required]').each(function() {
+                    if (!$(this).val()) {
+                        isValid = false;
+                        $(this).addClass('is-invalid');
+                    } else {
+                        $(this).removeClass('is-invalid');
+                    }
+                });
+
+                if (!isValid) {
+                    alert('Please fill in all required fields.');
+                    return false;
+                }
+
+                return true;
+            });
+        });
+    </script>
+}

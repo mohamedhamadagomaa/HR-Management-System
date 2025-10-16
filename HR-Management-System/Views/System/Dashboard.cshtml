@@ -1,0 +1,206 @@
+﻿@{
+    ViewData["Title"] = "System Dashboard";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-cogs me-2"></i>System Dashboard
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="/System/Settings" class="btn btn-outline-primary">
+            <i class="fas fa-sliders-h me-1"></i>System Settings
+        </a>
+    </div>
+</div>
+
+<!-- System Overview -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total Employees
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.TotalEmployees</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Pending Approvals
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.PendingLeaves</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clock fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Monthly Payroll
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">$@ViewBag.TotalPayroll.ToString("N2")</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Active Users
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.ActiveUsers</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-check fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Actions -->
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-tools me-2"></i>System Maintenance
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-warning" onclick="backupDatabase()">
+                        <i class="fas fa-database me-2"></i>Backup Database
+                    </button>
+                    <form method="post" action="/System/ResetLeaveBalances" class="d-grid">
+                        <button type="submit" class="btn btn-outline-info"
+                                onclick="return confirm('Are you sure you want to reset all leave balances?')">
+                            <i class="fas fa-sync me-2"></i>Reset Leave Balances
+                        </button>
+                    </form>
+                    <button class="btn btn-outline-secondary" onclick="clearCache()">
+                        <i class="fas fa-broom me-2"></i>Clear System Cache
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-shield-alt me-2"></i>Security
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/Audit" class="btn btn-outline-primary">
+                        <i class="fas fa-clipboard-list me-2"></i>View Audit Logs
+                    </a>
+                    <button class="btn btn-outline-success" onclick="generateSecurityReport()">
+                        <i class="fas fa-file-shield me-2"></i>Security Report
+                    </button>
+                    <button class="btn btn-outline-danger" onclick="systemHealthCheck()">
+                        <i class="fas fa-heartbeat me-2"></i>System Health Check
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Information -->
+<div class="card">
+    <div class="card-header bg-white">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-info-circle me-2"></i>System Information
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-sm table-borderless">
+                    <tr>
+                        <td><strong>System Version:</strong></td>
+                        <td>1.0.0</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Last Backup:</strong></td>
+                        <td>@DateTime.Now.AddDays(-1).ToString("MMM dd, yyyy HH:mm")</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Database Size:</strong></td>
+                        <td>45.2 MB</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <table class="table table-sm table-borderless">
+                    <tr>
+                        <td><strong>Server Time:</strong></td>
+                        <td>@DateTime.Now.ToString("MMM dd, yyyy HH:mm:ss")</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Uptime:</strong></td>
+                        <td>15 days, 4 hours</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Active Sessions:</strong></td>
+                        <td>8</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function backupDatabase() {
+            alert('Database backup process would start here...');
+        }
+
+        function clearCache() {
+            alert('System cache would be cleared...');
+        }
+
+        function generateSecurityReport() {
+            alert('Security report generation would start...');
+        }
+
+        function systemHealthCheck() {
+            alert('System health check would be performed...');
+        }
+    </script>
+}

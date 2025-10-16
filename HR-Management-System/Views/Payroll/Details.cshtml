@@ -1,0 +1,147 @@
+﻿@model Payroll
+@{
+    ViewData["Title"] = "Payslip Details";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-file-invoice me-2"></i>Payslip Details
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="/Payroll/ExportPdf/@Model.Id" class="btn btn-success me-2" target="_blank">
+            <i class="fas fa-download me-1"></i>Download PDF
+        </a>
+        <a href="/Payroll/MyPayslips" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Back to List
+        </a>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-building me-2"></i>Company Name
+                        </h4>
+                        <small>Employee Payslip</small>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <h5 class="mb-0">@Model.PayPeriod.ToString("MMMM yyyy")</h5>
+                        <small>Generated: @Model.GeneratedAt.ToString("MMM dd, yyyy")</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Employee Information -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6>Employee Information</h6>
+                        <table class="table table-sm table-borderless">
+                            <tr>
+                                <td><strong>Name:</strong></td>
+                                <td>@Model.Employee.Name</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Position:</strong></td>
+                                <td>@Model.Employee.Position</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Department:</strong></td>
+                                <td>@Model.Employee.Department</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Payroll Information</h6>
+                        <table class="table table-sm table-borderless">
+                            <tr>
+                                <td><strong>Pay Period:</strong></td>
+                                <td>@Model.PayPeriod.ToString("MMMM yyyy")</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Employee ID:</strong></td>
+                                <td>@Model.Employee.Id</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Payroll ID:</strong></td>
+                                <td>@Model.Id</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Earnings & Deductions -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card border-success">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Earnings</h6>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td>Base Salary</td>
+                                        <td class="text-end">$@Model.BaseSalary.ToString("N2")</td>
+                                    </tr>
+
+                                    @foreach (var allowance in Model.Allowances)
+                                    {
+                                        <tr>
+                                            <td>@allowance.Type</td>
+                                            <td class="text-end text-success">+$@allowance.Amount.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                    <tr class="table-active">
+                                        <td><strong>Total Earnings</strong></td>
+                                        <td class="text-end"><strong>$@((Model.BaseSalary + Model.TotalAllowances).ToString("N2"))</strong></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-danger">
+                            <div class="card-header bg-danger text-white">
+                                <h6 class="mb-0"><i class="fas fa-minus-circle me-2"></i>Deductions</h6>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm">
+                                    @foreach (var deduction in Model.Deductions)
+                                    {
+                                        <tr>
+                                            <td>@deduction.Type</td>
+                                            <td class="text-end text-danger">-$@deduction.Amount.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                    <tr class="table-active">
+                                        <td><strong>Total Deductions</strong></td>
+                                        <td class="text-end"><strong>-$@Model.TotalDeductions.ToString("N2")</strong></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Net Pay -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card border-primary">
+                            <div class="card-body text-center">
+                                <h4 class="card-title">Net Pay</h4>
+                                <h1 class="display-4 text-success">$@Model.NetPay.ToString("N2")</h1>
+                                <p class="text-muted">Amount to be transferred to your account</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-muted text-center">
+                This is a computer-generated payslip and does not require a signature.
+            </div>
+        </div>
+    </div>
+</div>

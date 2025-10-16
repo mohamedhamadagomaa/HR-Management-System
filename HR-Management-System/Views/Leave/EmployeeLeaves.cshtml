@@ -1,0 +1,215 @@
+﻿@model IEnumerable<LeaveRequest>
+@{
+    ViewData["Title"] = "My Leave Requests";
+    var currentBalance = ViewBag.CurrentBalance as int? ?? 21;
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-calendar-alt me-2"></i>My Leave Requests
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="/Leave/Apply" class="btn btn-success">
+            <i class="fas fa-plus-circle me-1"></i>Apply for Leave
+        </a>
+    </div>
+</div>
+
+<!-- Leave Balance Card -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Available Balance
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            @currentBalance days
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar-check fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Approved This Year
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            @Model.Count(lr => lr.Status == "Approved") requests
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Pending Approval
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            @Model.Count(lr => lr.Status == "Pending") requests
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clock fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="text-center py-5">
+        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No Leave Requests</h4>
+        <p class="text-muted">You haven't submitted any leave requests yet.</p>
+        <a href="/Leave/Apply" class="btn btn-primary mt-2">
+            <i class="fas fa-plus-circle me-1"></i>Apply for Your First Leave
+        </a>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-history me-2"></i>Leave Request History
+            </h5>
+            <span class="badge bg-primary">@Model.Count() Total Requests</span>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover" id="leavesTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Period</th>
+                            <th>Type</th>
+                            <th>Duration</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Applied On</th>
+                            <th>Manager Comments</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var request in Model.OrderByDescending(r => r.CreatedAt))
+                        {
+                            var days = (request.EndDate - request.StartDate).Days + 1;
+                            var statusClass = request.Status switch
+                            {
+                                "Approved" => "success",
+                                "Rejected" => "danger",
+                                _ => "warning"
+                            };
+
+                            var canCancel = request.Status == "Pending";
+
+                            <tr>
+                                <td>
+                                    <strong>@request.StartDate.ToString("MMM dd")</strong> -
+                                    <strong>@request.EndDate.ToString("MMM dd, yyyy")</strong>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">@request.LeaveType</span>
+                                </td>
+                                <td>
+                                    <span class="fw-bold">@days day(s)</span>
+                                </td>
+                                <td>
+                                    <span class="d-inline-block text-truncate" style="max-width: 200px;"
+                                          title="@request.Reason">
+                                        @request.Reason
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-@statusClass">@request.Status</span>
+                                </td>
+                                <td>@request.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(request.ManagerComments))
+                                    {
+                                        <span class="text-muted" title="@request.ManagerComments">
+                                            @(request.ManagerComments.Length > 50 ? request.ManagerComments.Substring(0, 50) + "..." : request.ManagerComments)
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (canCancel)
+                                    {
+                                        <button class="btn btn-outline-danger btn-sm"
+                                                onclick="cancelLeave(@request.Id, '@request.LeaveType', @days)">
+                                            <i class="fas fa-times"></i> Cancel
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#leavesTable').DataTable({
+                "order": [[5, "desc"]], // Sort by Applied On descending
+                "responsive": true,
+                "pageLength": 10
+            });
+        });
+
+        function cancelLeave(leaveId, leaveType, days) {
+            if (confirm(`Are you sure you want to cancel this ${leaveType} leave request for ${days} day(s)?`)) {
+                $.ajax({
+                    url: '/Leave/Cancel',
+                    type: 'POST',
+                    data: {
+                        id: leaveId
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert('Leave request cancelled successfully!');
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error cancelling leave: ' + error);
+                    }
+                });
+            }
+        }
+    </script>
+}

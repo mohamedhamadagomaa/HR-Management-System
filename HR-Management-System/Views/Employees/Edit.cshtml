@@ -1,0 +1,394 @@
+﻿@model Employee
+@{
+    ViewData["Title"] = "Edit Employee";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-user-edit me-2"></i>Edit Employee
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="/Employees" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Back to List
+        </a>
+    </div>
+</div>
+
+<!-- Success/Error Messages -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-user-circle me-2"></i>Employee Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="UserId" />
+                    <input type="hidden" asp-for="HireDate" />
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <!-- Basic Information -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2">
+                                <i class="fas fa-info-circle me-2"></i>Basic Information
+                            </h6>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Name" class="form-label">Full Name *</label>
+                            <input asp-for="Name" class="form-control" placeholder="Enter full name" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Department" class="form-label">Department *</label>
+                            <select asp-for="Department" class="form-select">
+                                <option value="">Select Department</option>
+                                <option value="IT">Information Technology</option>
+                                <option value="HR">Human Resources</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Sales">Sales</option>
+                                <option value="Operations">Operations</option>
+                                <option value="Engineering">Engineering</option>
+                                <option value="Customer Service">Customer Service</option>
+                            </select>
+                            <span asp-validation-for="Department" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Position" class="form-label">Position *</label>
+                            <input asp-for="Position" class="form-control" placeholder="Enter job position" />
+                            <span asp-validation-for="Position" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Salary" class="form-label">Monthly Salary *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="Salary" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                            </div>
+                            <span asp-validation-for="Salary" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Employment Details -->
+                    <div class="row mb-4 mt-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2">
+                                <i class="fas fa-briefcase me-2"></i>Employment Details
+                            </h6>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Role" class="form-label">Role *</label>
+                            <select asp-for="Role" class="form-select">
+                                <option value="Employee">Employee</option>
+                                <option value="Manager">Manager</option>
+                                <option value="HR">HR</option>
+                                <option value="Admin">Admin</option>
+                            </select>
+                            <span asp-validation-for="Role" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="LeaveBalance" class="form-label">Current Leave Balance</label>
+                            <div class="input-group">
+                                <input asp-for="LeaveBalance" type="number" class="form-control" />
+                                <span class="input-group-text">days</span>
+                            </div>
+                            <div class="form-text">Current available leave days</div>
+                            <span asp-validation-for="LeaveBalance" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">User ID (Login ID)</label>
+                            <input type="text" class="form-control" value="@Model.UserId" disabled />
+                            <div class="form-text">User ID cannot be changed</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Hire Date</label>
+                            <input type="text" class="form-control" value="@Model.HireDate.ToString("MMMM dd, yyyy")" disabled />
+                            <div class="form-text">Hire date cannot be changed</div>
+                        </div>
+                    </div>
+
+                    <!-- Read-only Information Card -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-info-circle me-2"></i>System Information
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <strong>Employee ID:</strong> @Model.Id
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>User ID:</strong> @Model.UserId
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Hire Date:</strong> @Model.HireDate.ToString("MMMM dd, yyyy")
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-md-4">
+                                            <strong>Tenure:</strong> @((DateTime.Now - Model.HireDate).Days / 365) years, @((DateTime.Now - Model.HireDate).Days % 365 / 30) months
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Status:</strong> <span class="badge bg-success">Active</span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Last Updated:</strong> Just now
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <button type="submit" class="btn btn-success me-2">
+                                        <i class="fas fa-save me-1"></i>Update Employee
+                                    </button>
+                                    <a href="/Employees" class="btn btn-secondary">
+                                        <i class="fas fa-times me-1"></i>Cancel
+                                    </a>
+                                </div>
+                                <div>
+                                    <a href="/Employees/Details/@Model.Id" class="btn btn-info me-2">
+                                        <i class="fas fa-eye me-1"></i>View Details
+                                    </a>
+                                    <a href="/Employees/Delete/@Model.Id" class="btn btn-outline-danger">
+                                        <i class="fas fa-trash me-1"></i>Delete
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats Card -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Monthly Salary
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">$@Model.Salary.ToString("N2")</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Leave Balance
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.LeaveBalance days</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar-check fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Department
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Department</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-building fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Role
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Role</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-tag fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // Add real-time salary formatting
+            $('#Salary').on('blur', function() {
+                var value = parseFloat($(this).val());
+                if (!isNaN(value)) {
+                    $(this).val(value.toFixed(2));
+                }
+            });
+
+            // Add confirmation for form submission
+            $('form').on('submit', function(e) {
+                var salary = parseFloat($('#Salary').val());
+                if (salary < 1000) {
+                    if (!confirm('The salary seems very low. Are you sure you want to save this?')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+
+                var leaveBalance = parseInt($('#LeaveBalance').val());
+                if (leaveBalance < 0) {
+                    alert('Leave balance cannot be negative.');
+                    e.preventDefault();
+                    return false;
+                }
+
+                return true;
+            });
+
+            // Department change effect
+            $('#Department').on('change', function() {
+                var department = $(this).val();
+                var departmentCard = $('#Department').closest('.card');
+
+                // Remove previous department classes
+                departmentCard.removeClass('border-it border-hr border-finance border-marketing border-sales');
+
+                // Add new department class
+                if (department) {
+                    departmentCard.addClass('border-' + department.toLowerCase());
+                }
+            });
+
+            // Role change styling
+            $('#Role').on('change', function() {
+                var role = $(this).val();
+                var roleBadge = $('.card-body .row:last .col-md-3:last .h5');
+
+                // Update role badge color based on role
+                roleBadge.removeClass('text-primary text-success text-warning text-danger');
+                switch(role) {
+                    case 'Admin':
+                        roleBadge.addClass('text-danger');
+                        break;
+                    case 'HR':
+                        roleBadge.addClass('text-warning');
+                        break;
+                    case 'Manager':
+                        roleBadge.addClass('text-success');
+                        break;
+                    default:
+                        roleBadge.addClass('text-primary');
+                        break;
+                }
+            });
+        });
+
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    </script>
+}
+
+<style>
+    .border-it {
+        border-left: 4px solid #4e73df !important;
+    }
+
+    .border-hr {
+        border-left: 4px solid #1cc88a !important;
+    }
+
+    .border-finance {
+        border-left: 4px solid #36b9cc !important;
+    }
+
+    .border-marketing {
+        border-left: 4px solid #f6c23e !important;
+    }
+
+    .border-sales {
+        border-left: 4px solid #e74a3b !important;
+    }
+
+    .card {
+        transition: box-shadow 0.3s ease;
+    }
+
+        .card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #4e73df;
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+</style>

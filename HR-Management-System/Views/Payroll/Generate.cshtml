@@ -1,0 +1,269 @@
+﻿@model GeneratePayrollViewModel
+@{
+    ViewData["Title"] = "Generate Payroll";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-calculator me-2"></i>Generate Payroll
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a asp-action="Manage" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Back to Payroll
+        </a>
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-play-circle me-2 text-primary"></i>Generate Payroll Run
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Generate" method="post" id="generateForm">
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <!-- Pay Period Selection -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label asp-for="PayPeriod" class="form-label fw-bold"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </span>
+                                    <input asp-for="PayPeriod" type="month" class="form-control"
+                                           min="@DateTime.Now.AddMonths(-12).ToString("yyyy-MM")"
+                                           max="@DateTime.Now.ToString("yyyy-MM")" />
+                                </div>
+                                <span asp-validation-for="PayPeriod" class="text-danger small"></span>
+                                <div class="form-text">
+                                    Select the payroll period (month and year) for which you want to generate payroll.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Process Options -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-cogs me-2"></i>Processing Options
+                                    </h6>
+                                    <div class="form-check form-switch">
+                                        <input asp-for="ProcessForAllEmployees" class="form-check-input" type="checkbox" checked>
+                                        <label asp-for="ProcessForAllEmployees" class="form-check-label fw-bold">
+                                            Process payroll for all active employees
+                                        </label>
+                                    </div>
+                                    <div class="form-text">
+                                        When enabled, payroll will be generated for all employees with active status.
+                                        When disabled, you can select specific employees (feature coming soon).
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preview Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card border-warning">
+                                <div class="card-header bg-warning text-dark">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>Important Notes
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="mb-2">
+                                            <i class="fas fa-info-circle text-primary me-2"></i>
+                                            Payroll will be calculated based on employee base salary, allowances, and deductions.
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-info-circle text-primary me-2"></i>
+                                            Leave deductions will be applied for unpaid leave taken during the period.
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-info-circle text-primary me-2"></i>
+                                            Existing payroll records for the selected period will be updated.
+                                        </li>
+                                        <li>
+                                            <i class="fas fa-info-circle text-primary me-2"></i>
+                                            This process may take several minutes depending on the number of employees.
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a asp-action="Manage" class="btn btn-secondary me-md-2">
+                                    <i class="fas fa-times me-1"></i>Cancel
+                                </a>
+                                <button type="submit" class="btn btn-success" id="generateBtn">
+                                    <i class="fas fa-play me-1"></i>Generate Payroll
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Card -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Payroll Statistics
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3 mb-3">
+                        <div class="border rounded p-3">
+                            <h4 class="text-primary" id="totalEmployees">0</h4>
+                            <small class="text-muted">Total Employees</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="border rounded p-3">
+                            <h4 class="text-success" id="lastPayrollPeriod">-</h4>
+                            <small class="text-muted">Last Processed</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="border rounded p-3">
+                            <h4 class="text-info" id="pendingLeaves">0</h4>
+                            <small class="text-muted">Pending Leaves</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="border rounded p-3">
+                            <h4 class="text-warning" id="estimatedCost">$0</h4>
+                            <small class="text-muted">Estimated Cost</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function() {
+            // Set default value to current month
+            var currentDate = new Date();
+            var currentMonth = currentDate.toISOString().slice(0, 7);
+            $('#PayPeriod').val(currentMonth);
+
+            // Form submission handler
+            $('#generateForm').on('submit', function() {
+                var btn = $('#generateBtn');
+                btn.prop('disabled', true);
+                btn.html('<i class="fas fa-spinner fa-spin me-1"></i>Generating...');
+
+                // You can add progress indication here
+                showProgressIndicator();
+            });
+
+            // Load statistics
+            loadPayrollStatistics();
+
+            // Update statistics when period changes
+            $('#PayPeriod').change(function() {
+                loadPayrollStatistics();
+            });
+
+            function loadPayrollStatistics() {
+                var selectedPeriod = $('#PayPeriod').val();
+
+                // Simulate loading statistics - replace with actual API call
+                $('#totalEmployees').text('Loading...');
+                $('#lastPayrollPeriod').text('Loading...');
+                $('#pendingLeaves').text('Loading...');
+                $('#estimatedCost').text('Loading...');
+
+                // In a real application, you would make an AJAX call here
+                // to get actual statistics for the selected period
+                setTimeout(function() {
+                    $('#totalEmployees').text('45');
+                    $('#lastPayrollPeriod').text('Not Processed');
+                    $('#pendingLeaves').text('3');
+                    $('#estimatedCost').text('$125,000');
+                }, 1000);
+            }
+
+            function showProgressIndicator() {
+                // You can implement a progress modal here
+                console.log('Payroll generation started...');
+
+                // Example: Show a progress modal
+                // $('#progressModal').modal('show');
+            }
+
+            // Confirmation before submission
+            $('#generateForm').on('submit', function(e) {
+                var selectedPeriod = $('#PayPeriod').val();
+                var periodText = new Date(selectedPeriod + '-01').toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long'
+                });
+
+                if (!confirm(`Are you sure you want to generate payroll for ${periodText}? This action cannot be undone.`)) {
+                    e.preventDefault();
+                    var btn = $('#generateBtn');
+                    btn.prop('disabled', false);
+                    btn.html('<i class="fas fa-play me-1"></i>Generate Payroll');
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .card {
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        border: 1px solid #e3e6f0;
+    }
+
+    .form-control:focus {
+        border-color: #4e73df;
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+
+    .btn-success {
+        background: linear-gradient(45deg, #1cc88a, #17a673);
+        border: none;
+    }
+
+        .btn-success:hover {
+            background: linear-gradient(45deg, #17a673, #14865c);
+        }
+</style>

@@ -1,0 +1,194 @@
+﻿@model IEnumerable<Payroll>
+@{
+    ViewData["Title"] = "Manage Payroll";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-money-bill-wave me-2"></i>Manage Payroll
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a asp-action="Generate" class="btn btn-success">
+            <i class="fas fa-plus me-1"></i>Generate Payroll
+        </a>
+    </div>
+</div>
+
+<!-- Period Navigation -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <h5 class="card-title mb-0">Payroll Period: @ViewBag.SelectedPeriod</h5>
+                    </div>
+                    <div class="col-md-8 text-end">
+                        <a asp-action="Manage" asp-route-period="@ViewBag.PreviousPeriod" class="btn btn-outline-primary">
+                            <i class="fas fa-chevron-left me-1"></i>Previous
+                        </a>
+                        <a asp-action="Manage" asp-route-period="@ViewBag.NextPeriod" class="btn btn-outline-primary">
+                            Next <i class="fas fa-chevron-right me-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total Employees
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalEmployees">@Model.Count()</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Total Net Pay
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalNetPay">
+                            @Model.Sum(p => p.NetPay).ToString("C")
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Total Allowances
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalAllowances">
+                            @Model.Sum(p => p.TotalAllowances).ToString("C")
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-plus-circle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Total Deductions
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalDeductions">
+                            @Model.Sum(p => p.TotalDeductions).ToString("C")
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-minus-circle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payroll List -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Payroll Records</h5>
+    </div>
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Employee</th>
+                            <th>Period</th>
+                            <th>Basic Salary</th>
+                            <th>Allowances</th>
+                            <th>Deductions</th>
+                            <th>Net Pay</th>
+                            @* <th>Status</th> *@
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var payroll in Model)
+                        {
+                            <tr>
+                                <td>@payroll.Employee?.Name</td>
+                                <td>@payroll.PayPeriod.ToString("MMMM yyyy")</td>
+                                <td>@payroll.BaseSalary.ToString("C")</td>
+                                <td>@payroll.TotalAllowances.ToString("C")</td>
+                                <td>@payroll.TotalDeductions.ToString("C")</td>
+                                <td>
+                                    <strong class="text-success">@payroll.NetPay.ToString("C")</strong>
+                                </td>
+                                @* <td> *@
+                                @*     <span class="badge bg-@(payroll. == "Processed" ? "success" : payroll.Status == "Pending" ? "warning" : "secondary")"> *@
+                                @*         @payroll.Status *@
+                                @*     </span> *@
+                                @* </td> *@
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@payroll.Id" class="btn btn-sm btn-info" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a asp-action="ExportPdf" asp-route-id="@payroll.Id" class="btn btn-sm btn-warning" title="Export PDF">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-4">
+                <i class="fas fa-file-invoice-dollar fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No payroll records found for this period.</p>
+                <a asp-action="Generate" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Generate Payroll
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // You can add AJAX functionality here to refresh summary
+            console.log("Payroll management loaded");
+        });
+    </script>
+}
