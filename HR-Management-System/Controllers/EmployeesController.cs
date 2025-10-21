@@ -21,6 +21,9 @@ namespace HR_Management_System.Controllers
 
         public async Task<IActionResult> Index()
         {
+            var currentUser = await employeeService.GetEmployeeByUserIdAsync(User.Identity.Name);
+
+            if (currentUser == null) return RedirectToAction("Login", "Account");
             var currentEmployee = await GetCurrentEmployeeAsync();
             SetEmployeeViewData(currentEmployee);
 

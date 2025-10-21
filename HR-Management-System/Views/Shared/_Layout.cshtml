@@ -12,8 +12,8 @@
     <!-- Your other stylesheets -->
     <style>
         body{
-            overflow-x: hidden;
-            overflow-y: auto;
+        overflow-x: hidden;
+        overflow-y: auto;
         }
     </style>
 </head>
@@ -21,34 +21,42 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 ps-5 pe-5">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">HR System</a>
+              
+                <a class="navbar-brand" asp-area="" asp-controller="Public" asp-action="Index">HR System</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+       
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
-                                <i class="fas fa-house me-1"></i>Home
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Employees" asp-action="Index">
-                                <i class="fas fa-users me-1"></i>Employees
-                            </a>
-                        </li>
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
+                                    <i class="fas fa-house me-1"></i>Home
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Employees" asp-action="Index">
+                                    <i class="fas fa-users me-1"></i>Employees
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Leave" asp-action="Index">
+                                    <i class="fa-solid fa-calendar-days"></i>Leave
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Payroll" asp-action="Index">
+                                    <i class="fas fa-money-bill-wave me-1"></i>Payroll
+                                </a>
+                            </li>
+                        }
+                      
+                      
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Leave" asp-action="Index">
-                                <i class="fa-solid fa-calendar-days"></i>Leave
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Payroll" asp-action="Index">
-                                <i class="fas fa-money-bill-wave me-1"></i>Payroll
-                            </a>
-                        </li>
+                       
                     </ul>
                     @if (SignInManager.IsSignedIn(User))
                     {
@@ -61,8 +69,11 @@
                                 @if (!string.IsNullOrEmpty(ViewBag.EmployeeName))
                                 {
                                     <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage"><i class="fas fa-user me-2"></i>@ViewBag.EmployeeName</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="fas fa-briefcase me-2"></i>@ViewBag.EmployeeRole</a></li>
+                                    @* <li><a class="dropdown-item" href="#"><i class="fas fa-briefcase me-2"></i>@ViewBag.EmployeeRole</a></li> *@
                                     <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" asp-controller="System" asp-action="Dashboard"><i class="fas fa-cogs me-2"></i>System Settings</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Register"><i class="fas fa-users me-2"></i> New User</a></li>
+
                                 }
                                 <li>
                                     <form class="form-inline" asp-controller="Account" asp-action="Logout" method="post">
@@ -84,11 +95,11 @@
                                 <i class="fas fa-sign-in-alt me-1"></i>Login
                             </a>
                         </li>
-                        <li class="nav-item  me-5">
-                            <a class="nav-link" href="/Account/Register">
-                                <i class="fas fa-user-plus me-1"></i>Register
-                            </a>
-                        </li>
+                        @* <li class="nav-item  me-5"> *@
+                        @*     <a class="nav-link" href="/Account/Register"> *@
+                        @*         <i class="fas fa-user-plus me-1"></i>Register *@
+                        @*     </a> *@
+                        @* </li> *@
                     }
                     <partial name="_LoginPartial" />
                 

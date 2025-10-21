@@ -53,6 +53,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("HR-Management"))
                 if (builder.Environment.IsDevelopment())
                 {
                     options.ExpireTimeSpan = TimeSpan.FromDays(1);
+                    
                     // Or set to shorter time
                 }
             });
@@ -75,15 +76,15 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("HR-Management"))
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-            if (app.Environment.IsDevelopment())
-            {
-                //app.Use(async (context, next) =>
-                //{
-                //    // Clear any existing authentication
-                //    await context.SignOutAsync(IdentityConstants.ApplicationScheme);
-                //    await next();
-                //});
-            }
+            //if (app.Environment.IsDevelopment())
+            //{
+            //    app.Use(async (context, next) =>
+            //    {
+            //        // Clear any existing authentication
+            //        await context.SignOutAsync(IdentityConstants.ApplicationScheme);
+            //        await next();
+            //    });
+            //}
             app.UseStaticFiles();
 
             app.UseRouting();

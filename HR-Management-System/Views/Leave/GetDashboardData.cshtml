@@ -1,0 +1,65 @@
+﻿@model IEnumerable<LeaveRequest>
+
+<!-- Add this debug section at the top -->
+<div class="alert alert-info">
+    <h6>Debug Information:</h6>
+    <p>Total Leave Requests: @Model.Count()</p>
+    <p>Pending: @Model.Count(lr => lr.Status == "Pending")</p>
+    <p>Approved: @Model.Count(lr => lr.Status == "Approved")</p>
+</div>
+
+<!-- Your existing table -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Days</th>
+            <th>Type</th>
+            <th>Current Balance</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var request in Model)
+        {
+            var days = (request.EndDate - request.StartDate).Days + 1;
+            <tr>
+                <td>@request.Employee.Name</td>
+                <td>@request.StartDate.ToString("MMM dd, yyyy")</td>
+                <td>@request.EndDate.ToString("MMM dd, yyyy")</td>
+                <td>@days days</td>
+                <td>
+                    <span class="badge bg-info">@request.LeaveType</span>
+                </td>
+                <td>
+                    <span class="fw-bold @(request.Employee.LeaveBalance < 5 ? "text-danger" : "text-success")">
+                        @request.Employee.LeaveBalance days
+                    </span>
+                </td>
+                <td>
+                    <span class="badge @(request.Status == "Approved" ? "bg-success" : request.Status == "Rejected" ? "bg-danger" : "bg-warning")">
+                        @request.Status
+                    </span>
+                </td>
+                <td>
+                    @if (request.Status == "Pending")
+                    {
+                        <button class="btn btn-success btn-sm" onclick="approveLeave(@request.Id, '@request.Employee.Name', @days)">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="rejectLeave(@request.Id)">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Processed</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

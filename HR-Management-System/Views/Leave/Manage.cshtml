@@ -63,3 +63,74 @@
         }
     </tbody>
 </table>
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#allLeavesTable').DataTable({
+                "order": [[7, "desc"]], // Sort by Applied date
+                "responsive": true,
+                "pageLength": 25
+            });
+
+            // Initialize tabs
+            var triggerTabList = [].slice.call(document.querySelectorAll('#leaveTabs button'))
+            triggerTabList.forEach(function (triggerEl) {
+                var tabTrigger = new bootstrap.Tab(triggerEl)
+                triggerEl.addEventListener('click', function (event) {
+                    event.preventDefault()
+                    tabTrigger.show()
+                })
+            });
+        });
+
+        function approveLeave(leaveId, employeeName, days, leaveType) {
+            var comments = prompt(`Enter comments for approving ${days} days of ${leaveType} leave for ${employeeName}:`, "Approved");
+            if (comments !== null) {
+                $.ajax({
+                    url: '/Leave/Approve',
+                    type: 'POST',
+                    data: {
+                        id: leaveId,
+                        comments: comments
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert('Leave approved successfully!');
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error approving leave: ' + error);
+                    }
+                });
+            }
+        }
+
+        function rejectLeave(leaveId, employeeName) {
+            var comments = prompt(`Enter reason for rejecting leave for ${employeeName}:`, "Not approved");
+            if (comments !== null) {
+                $.ajax({
+                    url: '/Leave/Reject',
+                    type: 'POST',
+                    data: {
+                        id: leaveId,
+                        comments: comments
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert('Leave rejected!');
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error rejecting leave: ' + error);
+                    }
+                });
+            }
+        }
+    </script>
+}

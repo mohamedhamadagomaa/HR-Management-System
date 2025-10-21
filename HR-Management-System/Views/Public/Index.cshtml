@@ -1,4 +1,7 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@{
     ViewData["Title"] = "HR Management System";
 }
 
@@ -48,14 +51,29 @@
                 </div>
             </div>
         </div>
-        <div class="mt-4">
-            <a href="/Account/Register" class="btn btn-primary btn-lg me-3">
-                <i class="fas fa-user-plus me-2"></i>Register Now
-            </a>
-            <a href="/Account/Login" class="btn btn-outline-primary btn-lg">
-                <i class="fas fa-sign-in-alt me-2"></i>LogIn Now
-            </a>
-        </div>
+        @if (!SignInManager.IsSignedIn(User))
+        {
+            <div class="mt-4"> 
+
+                <a href="/Account/Login" class="btn btn-outline-primary btn-lg"> 
+                    <i class="fas fa-sign-in-alt me-2"></i>Login Now 
+                </a> 
+            </div>
+        }
+        @*     <a href="/Account/Register" class="btn btn-primary btn-lg me-3"> *@
+        @*         <i class="fas fa-user-plus me-2"></i>Register Now *@
+        @*     </a> *@
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <div class="mt-4">
+
+                <a href="/Home" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-sign-in-alt me-2"></i>GetStarted
+                </a>
+            </div>
+        }
+      
+
     </div>
     <div class="col-lg-6 text-center">
         <div class="bg-primary text-white rounded p-5">
