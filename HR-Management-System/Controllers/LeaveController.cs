@@ -77,7 +77,7 @@ namespace HR_Management_System.Controllers
                     return RedirectToAction("Login", "Account");
                 }
 
-                if (model.StartDate >= model.EndDate)
+                if (model.StartDate > model.EndDate)
                 {
                     ModelState.AddModelError("", "End date must be after start date.");
                     return View(model);

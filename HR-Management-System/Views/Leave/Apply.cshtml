@@ -96,7 +96,7 @@
                 var startDate = new Date($('#StartDate').val());
                 var endDate = new Date($('#EndDate').val());
 
-                if (startDate && endDate && startDate >= endDate) {
+                if (startDate && endDate && startDate > endDate) {
                     alert('End date must be after start date.');
                     $('#EndDate').val('');
                 }

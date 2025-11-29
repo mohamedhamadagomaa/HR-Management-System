@@ -68,7 +68,8 @@ public class HomeController : BaseController
 
             var leaveBalance = currentEmployee.LeaveBalance;
             var myRequests = await _leaveService.GetLeaveRequestsByEmployeeIdAsync(currentEmployee.Id);
-             leaveBalance -=myRequests.Count;
+            
+       
             var monthlyPay = currentEmployee.Salary;
 
             // Build recent activity HTML

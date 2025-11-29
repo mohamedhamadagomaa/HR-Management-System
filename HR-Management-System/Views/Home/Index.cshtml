@@ -54,10 +54,15 @@
                             Leave Balance
                         </div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800" id="leaveBalance">
-                            <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            Loading...
+                        </div>
+
+                        <div class="h5 mb-0 font-weight-bold" id="leaveBalanceContainer">
+                            <span id="leaveBalanceText" class="text-gray-800">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                Loading...
+                            </span>
                         </div>
                     </div>
                     <div class="col-auto">
@@ -192,12 +197,32 @@
                 url: '/Home/GetDashboardData',
                 type: 'GET',
                 success: function(data) {
-                    if (data.success) {
-                        $('#leaveBalance').html(data.leaveBalance + ' days');
-                        $('#monthlyPay').html('$' + data.monthlyPay.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
-                        $('#myRequests').html(data.myRequests);
-                        $('#recentActivity').html(data.recentActivityHtml);
-                    } else {
+                          if (data.success) {
+            var balance = data.leaveBalance;
+            var balanceText = balance + ' days';
+            var balanceElement = $('#leaveBalanceText');
+
+            // Remove existing colors
+            balanceElement.removeClass('text-success text-warning text-danger text-gray-800').addClass('text-gray-800');
+
+            // Apply new color based on logic (e.g., Warning if < 10, Danger if < 5)
+            if (balance <= 0) {
+                balanceElement.addClass('text-danger');
+            } else if (balance < 5) {
+                balanceElement.addClass('text-danger');
+            } else if (balance < 10) {
+                balanceElement.addClass('text-warning');
+            } else {
+                balanceElement.addClass('text-success');
+            }
+
+            balanceElement.html(balanceText);
+
+            // Update other stats
+            $('#monthlyPay').html('$' + data.monthlyPay.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+            $('#myRequests').html(data.myRequests);
+            $('#recentActivity').html(data.recentActivityHtml);
+        } else {
                         showDefaultData();
                     }
                 },

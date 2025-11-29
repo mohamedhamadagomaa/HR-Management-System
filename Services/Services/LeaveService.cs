@@ -133,11 +133,38 @@ namespace Services.Services
                 .ToListAsync();
         }
 
+        // Inside Services/Services/LeaveService.cs
+
         public async Task<int> GetRemainingLeaveBalanceAsync(int employeeId)
         {
             var employee = await _context.Employees.FindAsync(employeeId);
             if (employee == null) throw new ArgumentException("Employee Not Found");
-            return employee?.LeaveBalance ?? 0;
+
+            // 1. Get the Official Balance (Balance after approved deductions)
+            int officialBalance = employee.LeaveBalance;
+
+            // 2. Calculate total days for Pending Annual Leave requests
+            // We only deduct "Annual" leave type and only those that are "Pending".
+            var pendingAnnualRequests = await _context.LeaveRequests
+                .Where(v => v.EmployeeId == employeeId &&
+                            v.LeaveType == "Annual" &&
+                            v.Status == "Pending")
+                .ToListAsync();
+
+            int pendingDays = 0;
+            foreach (var request in pendingAnnualRequests)
+            {
+                // Calculate days: (End - Start) + 1
+                // Ensure you handle the case where StartDate and EndDate might be the same day
+                pendingDays += (request.EndDate - request.StartDate).Days + 1;
+            }
+
+            // 3. Calculate the Available Balance for display/validation
+            int availableBalance = officialBalance - pendingDays;
+
+            // Ensure the returned balance is not negative for display purposes, 
+            // although validation should ideally catch this when creating the request.
+            return Math.Max(0, availableBalance);
         }
 
         public async Task<LeaveRequest> GetLeaveRequestByIdAsync(int id)
